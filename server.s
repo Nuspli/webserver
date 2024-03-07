@@ -109,7 +109,7 @@ CHILD:
     READ:
     syscall
     mov rdi, rax # rdi = 3
-    sub rsp, 256 # make room for 264 bytes on the stack
+    sub rsp, 256 # make room for 256 bytes on the stack
     mov rsi, rsp
     mov rdx, 256 # read 256 bytes to [sp]
     mov rax, 0
