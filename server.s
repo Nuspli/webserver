@@ -132,13 +132,13 @@ CHILD:
         jg exit
         cmp al, '\r'    # go until next \r
         jne WHILE2
-    ENTER_HIT:
+        # \r detected
         # is \r\n\r\n?
         mov eax, [rsp+rbx-1]
         cmp eax, 0x0a0d0a0d
         jne WHILE2      # regular \r\n ... keep going
     
-    # \r\n\r\n [rsp+rbx-1]
+    # \r\n\r\n is at [rsp+rbx-1]
     # 0 terminate data at end of body (r8 == number of bytes read from request)
 
     mov al, 0
@@ -149,8 +149,8 @@ CHILD:
     add rbx, 4      # to skip \r\n\r\n
     lea rsi, [rsp+rbx-1]
     sub r8, rbx
-    inc r8          # since rbx was 1 too big
-    lea rdx, [r8]   # how many bytes the body is
+    inc r8          # since rbx was 1 too big, this and the line before would be the same as: sub r8, rbx-1
+    mov rdx, r8     # how many bytes the body is
     mov rax, 1      # sys_write
     syscall
 
@@ -171,9 +171,9 @@ close_file:
     test r9, r9
     jnz exit
 
-    # write_file content
+    # else write file content
     mov rdi, 4
-    pop rdx         # number of file bytes, previously pushed to stack
+    pop rdx         # number of bytes read from the file, previously pushed to stack
     lea rsi, [rsp]  # file data
     mov rax, 1
     syscall
